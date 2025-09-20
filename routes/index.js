@@ -1,25 +1,14 @@
-// routes/index.js
 const express = require("express");
 const router = express.Router();
+const renderController = require("../controllers/renderController");
 
-// Import các route khác
-const authRoutes = require("./auth");
-const productRoutes = require("./products");
-const supplierRoutes = require("./suppliers");
+// Middleware kiểm tra đăng nhập
+function isAuthenticated(req, res, next) {
+  if (req.session.username) return next();
+  res.redirect("/auth/login");
+}
 
-// Trang home
-router.get("/", (req, res) => {
-  res.render("index", { title: "Trang chủ" });
-});
-
-// Các route chức năng
-router.use("/auth", authRoutes);
-router.use("/products", productRoutes);
-router.use("/suppliers", supplierRoutes);
-
-// 404 - Not Found
-router.use((req, res) => {
-  res.status(404).render("404", { title: "Không tìm thấy trang" });
-});
+// =================== DASHBOARD ===================
+router.get("/", isAuthenticated, renderController.renderDashboard);
 
 module.exports = router;

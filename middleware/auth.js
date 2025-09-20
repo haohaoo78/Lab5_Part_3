@@ -1,30 +1,23 @@
 // middleware/auth.js
 
-// Middleware kiểm tra user đã login hay chưa
-function isAuthenticated(req, res, next) {
-  if (req.session && req.session.userId) {
-    // Đã login
+// Middleware kiểm tra đăng nhập cho các route render (EJS)
+function ensureAuthenticated(req, res, next) {
+  if (req.session && req.session.username) {
     return next();
   }
-  // Chưa login
-  return res.status(401).json({ error: "Unauthorized - Vui lòng đăng nhập" });
+  // Nếu chưa login, redirect tới trang login
+  res.redirect("/auth/login");
 }
 
-// Middleware optional: nếu cần lấy thông tin user luôn
-const attachUser = async (req, res, next) => {
-  if (req.session && req.session.userId) {
-    const User = require("../models/User");
-    try {
-      const user = await User.findById(req.session.userId).select("-password");
-      if (user) req.user = user;
-    } catch (err) {
-      console.error(err);
-    }
+// Middleware kiểm tra đăng nhập cho API trả JSON
+function ensureAuthenticatedAPI(req, res, next) {
+  if (req.session && req.session.username) {
+    return next();
   }
-  next();
-};
+  res.status(401).json({ error: "Unauthorized. Please log in." });
+}
 
 module.exports = {
-  isAuthenticated,
-  attachUser,
+  ensureAuthenticated,
+  ensureAuthenticatedAPI,
 };
