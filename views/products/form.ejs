@@ -9,41 +9,20 @@
     
     <div class="mb-3">
       <label for="name" class="form-label">Tên sản phẩm</label>
-      <input
-        type="text"
-        class="form-control"
-        id="name"
-        name="name"
-        value="<%= product ? product.name : '' %>"
-        placeholder="Nhập tên sản phẩm"
-        required
-      >
+      <input type="text" class="form-control" id="name" name="name"
+             value="<%= product ? product.name : '' %>" placeholder="Nhập tên sản phẩm" required>
     </div>
 
     <div class="mb-3">
       <label for="price" class="form-label">Giá</label>
-      <input
-        type="number"
-        class="form-control"
-        id="price"
-        name="price"
-        value="<%= product ? product.price : '' %>"
-        placeholder="Nhập giá sản phẩm"
-        required
-      >
+      <input type="number" class="form-control" id="price" name="price"
+             value="<%= product ? product.price : '' %>" placeholder="Nhập giá sản phẩm" required>
     </div>
 
     <div class="mb-3">
       <label for="quantity" class="form-label">Số lượng</label>
-      <input
-        type="number"
-        class="form-control"
-        id="quantity"
-        name="quantity"
-        value="<%= product ? product.quantity : '' %>"
-        placeholder="Nhập số lượng"
-        required
-      >
+      <input type="number" class="form-control" id="quantity" name="quantity"
+             value="<%= product ? product.quantity : '' %>" placeholder="Nhập số lượng" required>
     </div>
 
     <div class="mb-3">
@@ -51,7 +30,7 @@
       <select class="form-select" id="supplier" name="supplier" required>
         <option value="">-- Chọn nhà cung cấp --</option>
         <% suppliers.forEach(s => { %>
-          <option value="<%= s._id %>" <%= product && product.supplier && product.supplier.equals(s._id) ? 'selected' : '' %>><%= s.name %></option>
+          <option value="<%= s._id %>" <%= product && product.supplier && product.supplier._id.equals(s._id) ? 'selected' : '' %>><%= s.name %></option>
         <% }) %>
       </select>
     </div>

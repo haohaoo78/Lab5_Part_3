@@ -1,39 +1,38 @@
-const User = require('../models/User');
+const User = require('../models/User'); // model User của bạn
 
-// =================== REGISTER ===================
+// REGISTER
 exports.register = async (req, res) => {
   try {
-    const { username, password, email, phone } = req.body;
-    const user = new User({ username, password, email, phone });
-    await user.save();
-    res.redirect("/auth/login"); // redirect tới trang login sau khi đăng ký
+    const { username, password } = req.body;
+
+    // Kiểm tra đã tồn tại username chưa
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.render('register', { title: 'Đăng ký', error: 'Username đã tồn tại', message: null });
+    }
+
+    // Tạo user mới
+    await User.create({ username, password });
+
+    res.render('register', { title: 'Đăng ký', error: null, message: 'Đăng ký thành công! Bạn có thể đăng nhập.' });
   } catch (err) {
-    res.status(400).send(err.message);
+    res.render('register', { title: 'Đăng ký', error: err.message, message: null });
   }
 };
 
-// =================== LOGIN ===================
+// LOGIN
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
-    const user = await User.findOne({ username });
-    if (!user) return res.status(404).send("User not found");
-
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) return res.status(400).send("Invalid password");
+    const user = await User.findOne({ username, password });
+    if (!user) {
+      return res.render('login', { title: 'Đăng nhập', error: 'Sai username hoặc password', message: null });
+    }
 
     // Lưu session
     req.session.username = user.username;
-    req.session.userId = user._id;
-
-    res.redirect("/"); // redirect về dashboard
+    res.redirect('/');
   } catch (err) {
-    res.status(500).send(err.message);
+    res.render('login', { title: 'Đăng nhập', error: err.message, message: null });
   }
-};
-
-// =================== LOGOUT ===================
-exports.logout = (req, res) => {
-  req.session.destroy();
-  res.redirect("/auth/login");
 };
