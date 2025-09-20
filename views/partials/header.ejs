@@ -1,0 +1,41 @@
+<link rel="stylesheet" href="../../public/css/header.css">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container">
+    <a class="navbar-brand" href="/">Dashboard</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <!-- Menu chính -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="/suppliers">Nhà cung cấp</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/products">Sản phẩm</a>
+        </li>
+      </ul>
+
+      <!-- Menu người dùng -->
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <% if (locals.user) { %>
+          <li class="nav-item">
+            <span class="nav-link">Xin chào, <%= user.username %></span>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/auth/logout">Đăng xuất</a>
+          </li>
+        <% } else { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/auth/login">Đăng nhập</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/auth/register">Đăng ký</a>
+          </li>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+</nav>

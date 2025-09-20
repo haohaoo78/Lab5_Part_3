@@ -1,0 +1,34 @@
+<%- include('../partials/header', { title: 'Danh sách Nhà Cung Cấp' }) %>
+<link rel="stylesheet" href="css/css.css">
+<div class="container mt-4">
+  <h2>Danh sách Nhà Cung Cấp</h2>
+  <a href="/suppliers/new" class="btn btn-primary mb-3">Thêm mới</a>
+
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Tên</th>
+        <th>Địa chỉ</th>
+        <th>Điện thoại</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% suppliers.forEach(s => { %>
+        <tr>
+          <td><%= s.name %></td>
+          <td><%= s.address %></td>
+          <td><%= s.phone %></td>
+          <td>
+            <a href="/suppliers/<%= s._id %>/edit" class="btn btn-sm btn-warning">Sửa</a>
+            <form action="/suppliers/<%= s._id %>?_method=DELETE" method="POST" style="display:inline;">
+              <button class="btn btn-sm btn-danger">Xóa</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../partials/footer') %>

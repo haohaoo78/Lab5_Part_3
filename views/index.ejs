@@ -1,0 +1,33 @@
+<%- include('partials/header', { title: "Trang quản lý" }) %>
+<link rel="stylesheet" href="css/css.css">
+<div class="container mt-5">
+  <h1 class="mb-4 text-center">Quản lý Sản phẩm & Nhà cung cấp</h1>
+
+  <div class="row text-center">
+    <!-- Nhà cung cấp -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h3 class="card-title">Nhà Cung Cấp</h3>
+          <p class="card-text">Quản lý danh sách nhà cung cấp</p>
+          <a href="/suppliers" class="btn btn-primary mb-2">Danh sách</a>
+          <a href="/suppliers/new" class="btn btn-success mb-2">Thêm mới</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sản phẩm -->
+    <div class="col-md-6 mb-4">
+      <div class="card shadow">
+        <div class="card-body">
+          <h3 class="card-title">Sản Phẩm</h3>
+          <p class="card-text">Quản lý danh sách sản phẩm</p>
+          <a href="/products" class="btn btn-primary mb-2">Danh sách</a>
+          <a href="/products/new" class="btn btn-success mb-2">Thêm mới</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
