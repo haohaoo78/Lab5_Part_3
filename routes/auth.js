@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User'); // Model User
+const crypto = require('crypto'); // nếu muốn tạo token reset
+// const nodemailer = require('nodemailer'); // nếu muốn gửi email
 
 // Middleware kiểm tra đăng nhập
 function isAuthenticated(req, res, next) {
@@ -8,7 +10,7 @@ function isAuthenticated(req, res, next) {
   res.redirect('/auth/login');
 }
 
-// Dashboard (chỉ truy cập khi đã login)
+// ===== DASHBOARD =====
 router.get('/', isAuthenticated, (req, res) => {
   res.render('index', {
     title: 'Dashboard',
@@ -16,7 +18,7 @@ router.get('/', isAuthenticated, (req, res) => {
   });
 });
 
-// GET register
+// ===== REGISTER =====
 router.get('/register', (req, res) => {
   res.render('register', {
     title: 'Đăng ký',
@@ -28,13 +30,11 @@ router.get('/register', (req, res) => {
   });
 });
 
-// POST register
 router.post('/register', async (req, res) => {
   try {
     const { username, email, phone, password } = req.body;
-
-    // Kiểm tra trùng username hoặc email
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+
     if (existingUser) {
       return res.render('register', {
         title: 'Đăng ký',
@@ -46,7 +46,6 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    // Lưu user mới (password sẽ tự hash theo schema pre-save)
     await User.create({ username, email, phone, password });
 
     res.render('register', {
@@ -69,7 +68,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// GET login
+// ===== LOGIN =====
 router.get('/login', (req, res) => {
   res.render('login', {
     title: 'Đăng nhập',
@@ -78,12 +77,11 @@ router.get('/login', (req, res) => {
   });
 });
 
-// POST login
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-
     const user = await User.findOne({ username });
+
     if (!user) {
       return res.render('login', {
         title: 'Đăng nhập',
@@ -92,7 +90,6 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // So sánh password hash
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.render('login', {
@@ -120,12 +117,51 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Logout
+// ===== LOGOUT =====
 router.get('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) console.error(err);
     res.redirect('/auth/login');
   });
+});
+
+// ===== FORGOT PASSWORD =====
+router.get('/forgot', (req, res) => {
+  res.render('forgot', {
+    title: 'Quên mật khẩu',
+    error: null,
+    message: null
+  });
+});
+
+router.post('/forgot', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.render('forgot', {
+        title: 'Quên mật khẩu',
+        error: 'Email không tồn tại',
+        message: null
+      });
+    }
+
+    // TODO: tạo token reset và gửi email
+    // const token = crypto.randomBytes(20).toString('hex');
+
+    res.render('forgot', {
+      title: 'Quên mật khẩu',
+      error: null,
+      message: 'Liên kết đặt lại mật khẩu đã được gửi tới email của bạn.'
+    });
+  } catch (err) {
+    res.render('forgot', {
+      title: 'Quên mật khẩu',
+      error: err.message,
+      message: null
+    });
+  }
 });
 
 module.exports = router;
