@@ -1,77 +1,94 @@
-const Supplier = require("../models/Supplier");
-const Product = require("../models/Product");
+// routes/suppliers.js
+const express = require("express");
+const router = express.Router();
+const ctrl = require("../controllers/supplierController");
+const { isAuthenticated } = require("../middleware/auth");
 
-// =================== DASHBOARD ===================
-exports.renderDashboard = async (req, res) => {
-  try {
-    const suppliers = await Supplier.find();
-    const products = await Product.find().populate("supplier");
-    res.render("index", { suppliers, products, title: "Dashboard" });
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-};
+/**
+ * @swagger
+ * tags:
+ *   name: Suppliers
+ *   description: Quản lý nhà cung cấp
+ */
 
-// =================== SUPPLIER ===================
-// Render
-exports.renderSuppliers = async (req, res) => {
-  const suppliers = await Supplier.find();
-  res.render("suppliers/index", { suppliers, title: "Danh sách Nhà Cung Cấp" });
-};
-exports.renderNewSupplier = (req, res) => {
-  res.render("suppliers/new", { title: "Thêm Nhà Cung Cấp" });
-};
-exports.renderEditSupplier = async (req, res) => {
-  const supplier = await Supplier.findById(req.params.id);
-  if (!supplier) return res.status(404).send("Supplier not found");
-  res.render("suppliers/edit", { supplier, title: "Sửa Nhà Cung Cấp" });
-};
+// ===== Routes view =====
+router.get("/", isAuthenticated, ctrl.renderSuppliers);        // Trang danh sách
+router.get("/new", isAuthenticated, ctrl.renderNewSupplier);  // Trang thêm mới
+router.get("/:id/edit", isAuthenticated, ctrl.renderEditSupplier); // Trang sửa
 
-// CRUD
-exports.createSupplier = async (req, res) => {
-  const { name, address, phone } = req.body;
-  await Supplier.create({ name, address, phone });
-  res.redirect("/suppliers");
-};
-exports.updateSupplier = async (req, res) => {
-  const { name, address, phone } = req.body;
-  await Supplier.findByIdAndUpdate(req.params.id, { name, address, phone });
-  res.redirect("/suppliers");
-};
-exports.deleteSupplier = async (req, res) => {
-  await Supplier.findByIdAndDelete(req.params.id);
-  res.redirect("/suppliers");
-};
+// ===== Routes API =====
+/**
+ * @swagger
+ * /suppliers:
+ *   post:
+ *     summary: Tạo mới nhà cung cấp
+ *     tags: [Suppliers]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Nhà cung cấp đã được tạo
+ */
+router.post("/", isAuthenticated, ctrl.createSupplier);
 
-// =================== PRODUCT ===================
-// Render
-exports.renderProducts = async (req, res) => {
-  const products = await Product.find().populate("supplier");
-  res.render("products/index", { products, title: "Danh sách Sản Phẩm" });
-};
-exports.renderNewProduct = async (req, res) => {
-  const suppliers = await Supplier.find();
-  res.render("products/new", { suppliers, title: "Thêm Sản Phẩm Mới" });
-};
-exports.renderEditProduct = async (req, res) => {
-  const product = await Product.findById(req.params.id).populate("supplier");
-  const suppliers = await Supplier.find();
-  if (!product) return res.status(404).send("Product not found");
-  res.render("products/edit", { product, suppliers, title: "Sửa Sản Phẩm" });
-};
+/**
+ * @swagger
+ * /suppliers/{id}:
+ *   put:
+ *     summary: Cập nhật nhà cung cấp
+ *     tags: [Suppliers]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Nhà cung cấp đã được cập nhật
+ */
+router.put("/:id", isAuthenticated, ctrl.updateSupplier);
 
-// CRUD
-exports.createProduct = async (req, res) => {
-  const { name, price, quantity, supplier } = req.body;
-  await Product.create({ name, price, quantity, supplier });
-  res.redirect("/products");
-};
-exports.updateProduct = async (req, res) => {
-  const { name, price, quantity, supplier } = req.body;
-  await Product.findByIdAndUpdate(req.params.id, { name, price, quantity, supplier });
-  res.redirect("/products");
-};
-exports.deleteProduct = async (req, res) => {
-  await Product.findByIdAndDelete(req.params.id);
-  res.redirect("/products");
-};
+/**
+ * @swagger
+ * /suppliers/{id}:
+ *   delete:
+ *     summary: Xóa nhà cung cấp
+ *     tags: [Suppliers]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Nhà cung cấp đã bị xóa
+ */
+router.delete("/:id", isAuthenticated, ctrl.deleteSupplier);
+
+module.exports = router;

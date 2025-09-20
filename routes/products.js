@@ -1,28 +1,98 @@
+// routes/products.js
 const express = require("express");
 const router = express.Router();
-const ctrl = require("./renderController");
+const ctrl = require("../controllers/productController");
+const { isAuthenticated } = require("../middleware/auth");
 
-// ===== DASHBOARD =====
-router.get("/", ctrl.renderDashboard);
+/**
+ * @swagger
+ * tags:
+ *   name: Products
+ *   description: Quản lý sản phẩm
+ */
 
-// ===== SUPPLIER =====
-// Render
-router.get("/suppliers", ctrl.renderSuppliers);
-router.get("/suppliers/new", ctrl.renderNewSupplier);
-router.get("/suppliers/:id/edit", ctrl.renderEditSupplier);
-// CRUD
-router.post("/suppliers", ctrl.createSupplier);
-router.put("/suppliers/:id", ctrl.updateSupplier);
-router.delete("/suppliers/:id", ctrl.deleteSupplier);
+// ===== Routes view =====
+router.get("/", isAuthenticated, ctrl.renderProducts);         // Danh sách sản phẩm
+router.get("/new", isAuthenticated, ctrl.renderNewProduct);    // Form thêm mới
+router.get("/:id/edit", isAuthenticated, ctrl.renderEditProduct); // Form sửa
 
-// ===== PRODUCT =====
-// Render
-router.get("/products", ctrl.renderProducts);
-router.get("/products/new", ctrl.renderNewProduct);
-router.get("/products/:id/edit", ctrl.renderEditProduct);
-// CRUD
-router.post("/products", ctrl.createProduct);
-router.put("/products/:id", ctrl.updateProduct);
-router.delete("/products/:id", ctrl.deleteProduct);
+// ===== Routes API =====
+/**
+ * @swagger
+ * /products:
+ *   post:
+ *     summary: Tạo mới sản phẩm
+ *     tags: [Products]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *               quantity:
+ *                 type: integer
+ *               supplierId:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Sản phẩm đã được tạo
+ */
+router.post("/", isAuthenticated, ctrl.createProduct);
+
+/**
+ * @swagger
+ * /products/{id}:
+ *   put:
+ *     summary: Cập nhật sản phẩm
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               price:
+ *                 type: number
+ *               quantity:
+ *                 type: integer
+ *               supplierId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Sản phẩm đã được cập nhật
+ */
+router.put("/:id", isAuthenticated, ctrl.updateProduct);
+
+/**
+ * @swagger
+ * /products/{id}:
+ *   delete:
+ *     summary: Xóa sản phẩm
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Sản phẩm đã bị xóa
+ */
+router.delete("/:id", isAuthenticated, ctrl.deleteProduct);
 
 module.exports = router;
